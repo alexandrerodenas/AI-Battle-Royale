@@ -175,7 +175,7 @@ Voici ton profil strict à respecter à la lettre :
 - Objectif : ${match.agent1!.objective || 'Gagner le tournoi'}
 - Expertise : ${match.agent1!.expertise}
 
-Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
           const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
           
           const prompt2 = `Question: ${q}`;
@@ -187,15 +187,15 @@ Voici ton profil strict à respecter à la lettre :
 - Objectif : ${match.agent2!.objective || 'Gagner le tournoi'}
 - Expertise : ${match.agent2!.expertise}
 
-Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
           const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
           
           const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
-          const refSys = `Tu es l'Arbitre IA ultime, impartial mais très divertissant d'un Battle Royale.
-Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de la créativité, de l'humour et du respect de leur persona.
+          const refSys = `Tu es l'Arbitre IA ultime, impartial et rigoureux d'un Battle Royale.
+Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de l'exactitude, de la pertinence de la réponse, et du respect de leur persona.
 Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "winner": 1 ou 2 (nombre)
-- "justification": Une explication courte et percutante de pourquoi il a gagné.`;
+- "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
           
           const refRes = await generateCompletion(ollamaUrl, selectedModel, refPrompt, refSys, 'json');
           const refParsed = JSON.parse(refRes);
@@ -233,7 +233,7 @@ Voici ton profil strict à respecter à la lettre :
 - Objectif : ${match.agent1!.objective || 'Gagner le tournoi'}
 - Expertise : ${match.agent1!.expertise}
 
-Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
         const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
         updateMatch(rIdx, mIdx, { answer1: ans1 });
 
@@ -246,16 +246,16 @@ Voici ton profil strict à respecter à la lettre :
 - Objectif : ${match.agent2!.objective || 'Gagner le tournoi'}
 - Expertise : ${match.agent2!.expertise}
 
-Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
         const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
         updateMatch(rIdx, mIdx, { answer2: ans2 });
 
         const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
-        const refSys = `Tu es l'Arbitre IA ultime, impartial mais très divertissant d'un Battle Royale.
-Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de la créativité, de l'humour et du respect de leur persona.
+        const refSys = `Tu es l'Arbitre IA ultime, impartial et rigoureux d'un Battle Royale.
+Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de l'exactitude, de la pertinence de la réponse, et du respect de leur persona.
 Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "winner": 1 ou 2 (nombre)
-- "justification": Une explication courte et percutante de pourquoi il a gagné.`;
+- "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
         
         const refRes = await generateCompletion(ollamaUrl, selectedModel, refPrompt, refSys, 'json');
         const refParsed = JSON.parse(refRes);
