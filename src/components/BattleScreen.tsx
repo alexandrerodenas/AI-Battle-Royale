@@ -42,9 +42,9 @@ export default function BattleScreen({ engine }: { engine: any }) {
         {activeMatch && (
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl">
             <div className="text-center mb-8">
-              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Current Match</h2>
+              <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Match en Cours</h2>
               {!activeMatch.isFinal && <p className="text-xl font-medium text-cyan-300 italic">"{activeMatch.question}"</p>}
-              {activeMatch.isFinal && <p className="text-xl font-medium text-fuchsia-300 uppercase tracking-widest">BEST OF 3</p>}
+              {activeMatch.isFinal && <p className="text-xl font-medium text-fuchsia-300 uppercase tracking-widest">MEILLEUR DES 3</p>}
             </div>
 
             {/* Final Match Display */}
@@ -64,7 +64,7 @@ export default function BattleScreen({ engine }: { engine: any }) {
                       </div>
                     </div>
                     <div className="mt-4 text-xs text-fuchsia-300 bg-fuchsia-900/20 p-2 rounded">
-                      <span className="font-bold">Referee:</span> {fa.just}
+                      <span className="font-bold">Arbitre :</span> {fa.just}
                     </div>
                   </div>
                 ))}
@@ -87,7 +87,7 @@ export default function BattleScreen({ engine }: { engine: any }) {
                     </div>
                   </div>
                   <div className="min-h-[100px] text-sm text-slate-300 italic">
-                    {activeMatch.answer1 ? `"${activeMatch.answer1}"` : engine.isProcessingMatch ? <span className="animate-pulse">Thinking...</span> : ''}
+                    {activeMatch.answer1 ? `"${activeMatch.answer1}"` : engine.isProcessingMatch ? <span className="animate-pulse">Réfléchit...</span> : ''}
                   </div>
                 </div>
 
@@ -100,7 +100,7 @@ export default function BattleScreen({ engine }: { engine: any }) {
                     </div>
                   </div>
                   <div className="min-h-[100px] text-sm text-slate-300 italic">
-                    {activeMatch.answer2 ? `"${activeMatch.answer2}"` : (engine.isProcessingMatch && activeMatch.answer1) ? <span className="animate-pulse">Thinking...</span> : ''}
+                    {activeMatch.answer2 ? `"${activeMatch.answer2}"` : (engine.isProcessingMatch && activeMatch.answer1) ? <span className="animate-pulse">Réfléchit...</span> : ''}
                   </div>
                 </div>
               </div>
@@ -114,12 +114,12 @@ export default function BattleScreen({ engine }: { engine: any }) {
                 className="mt-8 p-6 bg-fuchsia-900/10 border border-fuchsia-500/30 rounded-xl"
               >
                 <div className="flex items-center gap-3 mb-3 text-fuchsia-400 font-bold uppercase tracking-wider">
-                  <Gavel className="w-5 h-5" /> Referee's Verdict
+                  <Gavel className="w-5 h-5" /> Verdict de l'Arbitre
                 </div>
                 <p className="text-slate-200">{activeMatch.refereeJustification}</p>
                 <div className="mt-4 flex items-center gap-2 text-green-400 font-black text-lg">
                   <Trophy className="w-6 h-6" />
-                  {activeMatch.winner?.name} WINS!
+                  {activeMatch.winner?.name} GAGNE !
                 </div>
               </motion.div>
             )}
@@ -131,14 +131,14 @@ export default function BattleScreen({ engine }: { engine: any }) {
                   onClick={engine.advanceToNextMatch}
                   className="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition-colors flex items-center gap-2"
                 >
-                  {activeMatch.isFinal ? "Finish Tournament" : "Next Match"} <ChevronRight className="w-5 h-5" />
+                  {activeMatch.isFinal ? "Terminer le Tournoi" : "Match Suivant"} <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
             )}
 
             {engine.isProcessingMatch && (
               <div className="mt-8 text-center text-slate-500 animate-pulse font-mono text-sm">
-                Awaiting AI responses...
+                En attente des réponses de l'IA...
               </div>
             )}
           </div>

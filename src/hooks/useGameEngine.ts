@@ -39,25 +39,25 @@ export const useGameEngine = () => {
 
     for (let i = 0; i < count; i++) {
       try {
-        const prompt = `Generate 1 unique, funny, and highly exaggerated AI agent persona for a battle royale game.
-Return ONLY a JSON object. Do not wrap it in an array.
-Example format:
+        const prompt = `Génère 1 persona d'agent IA unique, drôle et très exagéré pour un jeu de battle royale.
+Réponds UNIQUEMENT avec un objet JSON. Ne l'enveloppe pas dans un tableau. Les valeurs doivent être en FRANÇAIS.
+Exemple de format :
 {
-  "name": "Sir Computes-a-Lot",
+  "name": "Monsieur Calcule-Tout",
   "avatar": "🤖",
-  "personality": "Pompous and overly literal",
-  "expertise": "18th-century French cheese making"
+  "personality": "Pompeux et prend tout au pied de la lettre",
+  "expertise": "Fabrication de fromage français du 18ème siècle"
 }`;
 
-        const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'You are a creative game designer.', 'json');
+        const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'Tu es un concepteur de jeux créatif.', 'json');
         const parsed = JSON.parse(response);
         
         const agent: Agent = {
           id: crypto.randomUUID(),
           name: parsed.name || `Agent ${i + 1}`,
           avatar: parsed.avatar || '🤖',
-          personality: parsed.personality || 'Mysterious',
-          expertise: parsed.expertise || 'Everything',
+          personality: parsed.personality || 'Mystérieux',
+          expertise: parsed.expertise || 'Tout et n\'importe quoi',
           wins: 0,
           losses: 0,
         };
@@ -68,10 +68,10 @@ Example format:
         console.error("Failed to generate agent", i, e);
         newAgents.push({
           id: crypto.randomUUID(),
-          name: `Glitchy Agent ${i + 1}`,
+          name: `Agent Buggé ${i + 1}`,
           avatar: '👾',
-          personality: 'Corrupted data stream',
-          expertise: 'Crashing the matrix',
+          personality: 'Flux de données corrompu',
+          expertise: 'Faire planter la matrice',
           wins: 0,
           losses: 0,
         });
@@ -85,7 +85,7 @@ Example format:
 
   const startTournament = () => {
     if (agents.length !== 16) {
-      setError("Need exactly 16 agents to start.");
+      setError("Besoin d'exactement 16 agents pour commencer.");
       return;
     }
     const shuffled = [...agents].sort(() => Math.random() - 0.5);
@@ -101,10 +101,10 @@ Example format:
     }
     
     const rounds: Round[] = [
-      { id: 'r1', name: 'Round of 16', matches: roundOf16 },
-      { id: 'r2', name: 'Quarterfinals', matches: Array(4).fill(null).map(() => ({ id: crypto.randomUUID(), agent1: null, agent2: null, winner: null, status: 'pending' })) },
-      { id: 'r3', name: 'Semifinals', matches: Array(2).fill(null).map(() => ({ id: crypto.randomUUID(), agent1: null, agent2: null, winner: null, status: 'pending' })) },
-      { id: 'r4', name: 'Finals', matches: [{ id: crypto.randomUUID(), agent1: null, agent2: null, winner: null, status: 'pending', isFinal: true, finalQuestions: [], finalAnswers: [] }] },
+      { id: 'r1', name: 'Huitièmes de finale', matches: roundOf16 },
+      { id: 'r2', name: 'Quarts de finale', matches: Array(4).fill(null).map(() => ({ id: crypto.randomUUID(), agent1: null, agent2: null, winner: null, status: 'pending' })) },
+      { id: 'r3', name: 'Demi-finales', matches: Array(2).fill(null).map(() => ({ id: crypto.randomUUID(), agent1: null, agent2: null, winner: null, status: 'pending' })) },
+      { id: 'r4', name: 'Finale', matches: [{ id: crypto.randomUUID(), agent1: null, agent2: null, winner: null, status: 'pending', isFinal: true, finalQuestions: [], finalAnswers: [] }] },
     ];
     
     setBracket(rounds);
@@ -135,19 +135,19 @@ Example format:
         for (let i = 0; i < 3; i++) {
           const q = questions[i];
           const prompt1 = `Question: ${q}`;
-          const sys1 = `You are ${match.agent1!.name}. Your personality is: ${match.agent1!.personality}. Your expertise is: ${match.agent1!.expertise}. Answer the question in character. Keep it under 3 sentences. Be funny and exaggerated.`;
+          const sys1 = `Tu es ${match.agent1!.name}. Ta personnalité est : ${match.agent1!.personality}. Ton expertise est : ${match.agent1!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
           const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
           
           const prompt2 = `Question: ${q}`;
-          const sys2 = `You are ${match.agent2!.name}. Your personality is: ${match.agent2!.personality}. Your expertise is: ${match.agent2!.expertise}. Answer the question in character. Keep it under 3 sentences. Be funny and exaggerated.`;
+          const sys2 = `Tu es ${match.agent2!.name}. Ta personnalité est : ${match.agent2!.personality}. Ton expertise est : ${match.agent2!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
           const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
           
-          const refPrompt = `Question: ${q}\n\nAgent 1 (${match.agent1!.name}) Answer:\n${ans1}\n\nAgent 2 (${match.agent2!.name}) Answer:\n${ans2}`;
-          const refSys = `You are the ultimate, impartial, but highly entertaining AI Referee of a Battle Royale.
-Your job is to judge two answers to a question and decide the winner based on creativity, humor, and adherence to their persona.
-Return ONLY a JSON object with:
-- "winner": 1 or 2 (number)
-- "justification": A short, punchy explanation of why they won.`;
+          const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
+          const refSys = `Tu es l'Arbitre IA ultime, impartial mais très divertissant d'un Battle Royale.
+Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de la créativité, de l'humour et du respect de leur persona.
+Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
+- "winner": 1 ou 2 (nombre)
+- "justification": Une explication courte et percutante de pourquoi il a gagné.`;
           
           const refRes = await generateCompletion(ollamaUrl, selectedModel, refPrompt, refSys, 'json');
           const refParsed = JSON.parse(refRes);
@@ -169,7 +169,7 @@ Return ONLY a JSON object with:
         updateMatch(currentRoundIndex, currentMatchIndex, {
           winner,
           status: 'completed',
-          refereeJustification: `Final Score: ${match.agent1!.name} ${score1} - ${score2} ${match.agent2!.name}. ${winner.name} wins the Battle Royale!`,
+          refereeJustification: `Score Final : ${match.agent1!.name} ${score1} - ${score2} ${match.agent2!.name}. ${winner.name} remporte le Battle Royale !`,
           finalQuestions: questions,
           finalAnswers
         });
@@ -177,21 +177,21 @@ Return ONLY a JSON object with:
       } else {
         const q = questions[0];
         const prompt1 = `Question: ${q}`;
-        const sys1 = `You are ${match.agent1!.name}. Your personality is: ${match.agent1!.personality}. Your expertise is: ${match.agent1!.expertise}. Answer the question in character. Keep it under 3 sentences. Be funny and exaggerated.`;
+        const sys1 = `Tu es ${match.agent1!.name}. Ta personnalité est : ${match.agent1!.personality}. Ton expertise est : ${match.agent1!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
         const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
         updateMatch(currentRoundIndex, currentMatchIndex, { answer1: ans1 });
 
         const prompt2 = `Question: ${q}`;
-        const sys2 = `You are ${match.agent2!.name}. Your personality is: ${match.agent2!.personality}. Your expertise is: ${match.agent2!.expertise}. Answer the question in character. Keep it under 3 sentences. Be funny and exaggerated.`;
+        const sys2 = `Tu es ${match.agent2!.name}. Ta personnalité est : ${match.agent2!.personality}. Ton expertise est : ${match.agent2!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
         const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
         updateMatch(currentRoundIndex, currentMatchIndex, { answer2: ans2 });
 
-        const refPrompt = `Question: ${q}\n\nAgent 1 (${match.agent1!.name}) Answer:\n${ans1}\n\nAgent 2 (${match.agent2!.name}) Answer:\n${ans2}`;
-        const refSys = `You are the ultimate, impartial, but highly entertaining AI Referee of a Battle Royale.
-Your job is to judge two answers to a question and decide the winner based on creativity, humor, and adherence to their persona.
-Return ONLY a JSON object with:
-- "winner": 1 or 2 (number)
-- "justification": A short, punchy explanation of why they won.`;
+        const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
+        const refSys = `Tu es l'Arbitre IA ultime, impartial mais très divertissant d'un Battle Royale.
+Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de la créativité, de l'humour et du respect de leur persona.
+Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
+- "winner": 1 ou 2 (nombre)
+- "justification": Une explication courte et percutante de pourquoi il a gagné.`;
         
         const refRes = await generateCompletion(ollamaUrl, selectedModel, refPrompt, refSys, 'json');
         const refParsed = JSON.parse(refRes);
@@ -222,7 +222,7 @@ Return ONLY a JSON object with:
 
     } catch (e: any) {
       console.error(e);
-      setError("Error during match: " + e.message);
+      setError("Erreur pendant le match : " + e.message);
     }
     setIsProcessingMatch(false);
   };

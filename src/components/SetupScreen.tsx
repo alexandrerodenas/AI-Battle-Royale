@@ -22,14 +22,14 @@ export default function SetupScreen({ engine }: { engine: any }) {
   return (
     <div className="max-w-2xl mx-auto mt-12 space-y-8 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl shadow-fuchsia-900/20">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-black uppercase tracking-tight">System Configuration</h2>
-        <p className="text-slate-400">Connect to your local Ollama instance to begin.</p>
+        <h2 className="text-3xl font-black uppercase tracking-tight">Configuration du Système</h2>
+        <p className="text-slate-400">Connectez-vous à votre instance Ollama locale pour commencer.</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
           <label className="flex items-center gap-2 text-sm font-bold text-slate-300 uppercase tracking-wider">
-            <Server className="w-4 h-4 text-fuchsia-500" /> Ollama URL
+            <Server className="w-4 h-4 text-fuchsia-500" /> URL Ollama
           </label>
           <div className="flex gap-2">
             <input
@@ -43,16 +43,16 @@ export default function SetupScreen({ engine }: { engine: any }) {
               disabled={isLoadingModels}
               className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg font-bold transition-colors disabled:opacity-50"
             >
-              Connect
+              Connecter
             </button>
           </div>
-          <p className="text-xs text-slate-500">Make sure Ollama is running with OLLAMA_ORIGINS="*"</p>
+          <p className="text-xs text-slate-500">Assurez-vous qu'Ollama tourne avec OLLAMA_ORIGINS="*"</p>
         </div>
 
         {models.length > 0 && (
           <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4">
             <label className="flex items-center gap-2 text-sm font-bold text-slate-300 uppercase tracking-wider">
-              <Cpu className="w-4 h-4 text-cyan-500" /> Select Model
+              <Cpu className="w-4 h-4 text-cyan-500" /> Sélectionner un Modèle
             </label>
             <select
               value={engine.selectedModel}
@@ -70,7 +70,7 @@ export default function SetupScreen({ engine }: { engine: any }) {
           className="w-full bg-gradient-to-r from-fuchsia-600 to-cyan-600 hover:from-fuchsia-500 hover:to-cyan-500 text-white px-6 py-4 rounded-xl font-black uppercase tracking-widest text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg shadow-fuchsia-900/50"
         >
           <Play className="w-6 h-6" />
-          Generate Fighters
+          Générer les Combattants
         </button>
       </div>
     </div>

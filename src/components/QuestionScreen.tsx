@@ -22,7 +22,7 @@ export default function QuestionScreen({ engine }: { engine: any }) {
           {engine.bracket[engine.currentRoundIndex].name}
         </h2>
         <p className="text-slate-400">
-          {isFinal ? "The Grand Finale! Enter 3 questions to decide the ultimate champion." : "Enter the question for this round."}
+          {isFinal ? "La Grande Finale ! Entrez 3 questions pour décider du champion ultime." : "Entrez la question pour cette manche."}
         </p>
       </div>
 
@@ -33,7 +33,7 @@ export default function QuestionScreen({ engine }: { engine: any }) {
             <textarea
               value={q1}
               onChange={(e) => setQ1(e.target.value)}
-              placeholder="e.g., How would you solve world hunger using only cheese?"
+              placeholder="ex: Comment résoudriez-vous la faim dans le monde en utilisant uniquement du fromage ?"
               className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-14 pr-4 py-4 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-medium min-h-[120px] resize-none"
             />
           </div>
@@ -68,7 +68,7 @@ export default function QuestionScreen({ engine }: { engine: any }) {
           className="w-full bg-cyan-600 hover:bg-cyan-500 text-white px-6 py-4 rounded-xl font-black uppercase tracking-widest text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
         >
           <Play className="w-6 h-6" />
-          Let the Battles Begin
+          Que le Combat Commence
         </button>
       </div>
     </div>

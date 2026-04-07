@@ -49,9 +49,9 @@ export default function GameOverScreen({ engine }: { engine: any }) {
           <p className="text-xl text-slate-400 italic mb-6">"{winner.personality}"</p>
           
           <div className="flex justify-center gap-8 text-sm font-mono text-cyan-400 mb-8">
-            <div>Wins: {winner.wins}</div>
-            <div>Losses: {winner.losses}</div>
-            <div>Expertise: {winner.expertise}</div>
+            <div>Victoires : {winner.wins}</div>
+            <div>Défaites : {winner.losses}</div>
+            <div>Expertise : {winner.expertise}</div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -60,14 +60,14 @@ export default function GameOverScreen({ engine }: { engine: any }) {
               className="bg-yellow-500 hover:bg-yellow-400 text-slate-900 px-8 py-4 rounded-xl font-black uppercase tracking-widest text-lg transition-all shadow-lg shadow-yellow-900/50 flex items-center justify-center gap-3"
             >
               <Star className="w-6 h-6" />
-              Save to Favorites
+              Sauvegarder en Favori
             </button>
             <button
               onClick={() => window.location.reload()}
               className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-4 rounded-xl font-black uppercase tracking-widest text-lg transition-all flex items-center justify-center gap-3"
             >
               <RotateCcw className="w-6 h-6" />
-              Play Again
+              Rejouer
             </button>
           </div>
         </div>
