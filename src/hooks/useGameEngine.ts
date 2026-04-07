@@ -32,24 +32,52 @@ export const useGameEngine = () => {
     setError(null);
     try {
       const prompt = `Generate ${count} unique, funny, and highly exaggerated AI agent personas for a battle royale game.
-Return ONLY a JSON array of objects. Each object must have exactly these keys:
-- "name": A funny name
-- "avatar": A single emoji
-- "personality": A short description of their quirky personality
-- "expertise": A weirdly specific topic they are experts in`;
+Return ONLY a JSON array of objects. Do not wrap the array in an object.
+Example format:
+[
+  {
+    "name": "Sir Computes-a-Lot",
+    "avatar": "🤖",
+    "personality": "Pompous and overly literal",
+    "expertise": "18th-century French cheese making"
+  }
+]`;
 
       const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'You are a creative game designer.', 'json');
-      const parsed = JSON.parse(response);
+      let parsed = JSON.parse(response);
       
-      const newAgents: Agent[] = parsed.map((a: any) => ({
+      // Handle cases where the model wraps the array in an object (e.g., { "agents": [...] })
+      if (!Array.isArray(parsed)) {
+        const arrayValue = Object.values(parsed).find(val => Array.isArray(val));
+        if (arrayValue) {
+          parsed = arrayValue;
+        } else {
+          throw new Error("The model did not return a valid array of agents. Please try again.");
+        }
+      }
+      
+      const newAgents: Agent[] = parsed.slice(0, count).map((a: any) => ({
         id: crypto.randomUUID(),
-        name: a.name,
+        name: a.name || 'Unknown Agent',
         avatar: a.avatar || '🤖',
-        personality: a.personality,
-        expertise: a.expertise,
+        personality: a.personality || 'Mysterious',
+        expertise: a.expertise || 'Everything',
         wins: 0,
         losses: 0,
       }));
+      
+      // If the model generated fewer agents than requested, pad the array
+      while (newAgents.length < count) {
+        newAgents.push({
+          id: crypto.randomUUID(),
+          name: `Backup Agent ${newAgents.length + 1}`,
+          avatar: '👾',
+          personality: 'Generic backup personality',
+          expertise: 'Filling empty slots',
+          wins: 0,
+          losses: 0,
+        });
+      }
       
       setAgents(newAgents);
       setGameState('roster');
