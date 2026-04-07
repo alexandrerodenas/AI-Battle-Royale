@@ -34,13 +34,7 @@ export default function App() {
         )}
 
         {engine.gameState === 'setup' && <SetupScreen engine={engine} />}
-        {engine.gameState === 'generating_agents' && (
-          <div className="flex flex-col items-center justify-center py-32 space-y-6">
-            <div className="w-16 h-16 border-4 border-fuchsia-500 border-t-transparent rounded-full animate-spin"></div>
-            <h2 className="text-2xl font-bold animate-pulse text-fuchsia-400">Summoning Agents from the Void...</h2>
-          </div>
-        )}
-        {engine.gameState === 'roster' && <RosterScreen engine={engine} />}
+        {(engine.gameState === 'generating_agents' || engine.gameState === 'roster') && <RosterScreen engine={engine} />}
         {engine.gameState === 'question_input' && <QuestionScreen engine={engine} />}
         {engine.gameState === 'battling' && <BattleScreen engine={engine} />}
         {engine.gameState === 'game_over' && <GameOverScreen engine={engine} />}

@@ -27,64 +27,60 @@ export const useGameEngine = () => {
     localStorage.setItem('favoriteAgents', JSON.stringify(newFavs));
   };
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const generateAgents = async (count: number = 16) => {
     setGameState('generating_agents');
+    setAgents([]);
     setError(null);
-    try {
-      const prompt = `Generate ${count} unique, funny, and highly exaggerated AI agent personas for a battle royale game.
-Return ONLY a JSON array of objects. Do not wrap the array in an object.
-Example format:
-[
-  {
-    "name": "Sir Computes-a-Lot",
-    "avatar": "🤖",
-    "personality": "Pompous and overly literal",
-    "expertise": "18th-century French cheese making"
-  }
-]`;
+    setIsGenerating(true);
 
-      const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'You are a creative game designer.', 'json');
-      let parsed = JSON.parse(response);
-      
-      // Handle cases where the model wraps the array in an object (e.g., { "agents": [...] })
-      if (!Array.isArray(parsed)) {
-        const arrayValue = Object.values(parsed).find(val => Array.isArray(val));
-        if (arrayValue) {
-          parsed = arrayValue;
-        } else {
-          throw new Error("The model did not return a valid array of agents. Please try again.");
-        }
-      }
-      
-      const newAgents: Agent[] = parsed.slice(0, count).map((a: any) => ({
-        id: crypto.randomUUID(),
-        name: a.name || 'Unknown Agent',
-        avatar: a.avatar || '🤖',
-        personality: a.personality || 'Mysterious',
-        expertise: a.expertise || 'Everything',
-        wins: 0,
-        losses: 0,
-      }));
-      
-      // If the model generated fewer agents than requested, pad the array
-      while (newAgents.length < count) {
+    const newAgents: Agent[] = [];
+
+    for (let i = 0; i < count; i++) {
+      try {
+        const prompt = `Generate 1 unique, funny, and highly exaggerated AI agent persona for a battle royale game.
+Return ONLY a JSON object. Do not wrap it in an array.
+Example format:
+{
+  "name": "Sir Computes-a-Lot",
+  "avatar": "🤖",
+  "personality": "Pompous and overly literal",
+  "expertise": "18th-century French cheese making"
+}`;
+
+        const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'You are a creative game designer.', 'json');
+        const parsed = JSON.parse(response);
+        
+        const agent: Agent = {
+          id: crypto.randomUUID(),
+          name: parsed.name || `Agent ${i + 1}`,
+          avatar: parsed.avatar || '🤖',
+          personality: parsed.personality || 'Mysterious',
+          expertise: parsed.expertise || 'Everything',
+          wins: 0,
+          losses: 0,
+        };
+        
+        newAgents.push(agent);
+        setAgents([...newAgents]);
+      } catch (e: any) {
+        console.error("Failed to generate agent", i, e);
         newAgents.push({
           id: crypto.randomUUID(),
-          name: `Backup Agent ${newAgents.length + 1}`,
+          name: `Glitchy Agent ${i + 1}`,
           avatar: '👾',
-          personality: 'Generic backup personality',
-          expertise: 'Filling empty slots',
+          personality: 'Corrupted data stream',
+          expertise: 'Crashing the matrix',
           wins: 0,
           losses: 0,
         });
+        setAgents([...newAgents]);
       }
-      
-      setAgents(newAgents);
-      setGameState('roster');
-    } catch (e: any) {
-      setError(e.message);
-      setGameState('setup');
     }
+    
+    setIsGenerating(false);
+    setGameState('roster');
   };
 
   const startTournament = () => {
@@ -274,6 +270,7 @@ Return ONLY a JSON object with:
     currentMatchIndex,
     currentQuestions,
     isProcessingMatch,
+    isGenerating,
     error, setError,
     favorites, saveFavorite,
     generateAgents,
