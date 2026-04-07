@@ -39,14 +39,25 @@ export const useGameEngine = () => {
 
     for (let i = 0; i < count; i++) {
       try {
-        const prompt = `Génère 1 persona d'agent IA unique, drôle et très exagéré pour un jeu de battle royale.
-Réponds UNIQUEMENT avec un objet JSON. Ne l'enveloppe pas dans un tableau. Les valeurs doivent être en FRANÇAIS.
-Exemple de format :
+        const prompt = `Génère un profil de personnage IA unique et créatif en français pour un jeu de Battle Royale d'IA.
+Le nom de l'agent DOIT être un titre simple mais évocateur (ex: L'Analyste Rigoureux, Le Mentor Bienveillant, L'Historien Voyageur, Le Pirate de l'Espace).
+
+Tu dois définir sa personnalité selon 4 piliers stricts :
+1. Identité : Qui est l'IA ? (Nom, métier, trait de caractère principal).
+2. Style de Langage : Quel ton utilise-t-elle ? (Soutenu, familier, technique, imagé, etc.).
+3. Contraintes : Ce qu'elle doit absolument faire ou éviter (ex: ne jamais utiliser d'emojis, toujours faire des rimes, parler en majuscules, etc.).
+4. Objectif : Quelle est sa mission principale lors de l'échange ?
+
+Réponds UNIQUEMENT avec un objet JSON valide avec cette structure exacte :
 {
-  "name": "Monsieur Calcule-Tout",
-  "avatar": "🤖",
-  "personality": "Pompeux et prend tout au pied de la lettre",
-  "expertise": "Fabrication de fromage français du 18ème siècle"
+  "name": "Titre évocateur",
+  "avatar": "1 seul emoji",
+  "catchphrase": "Une phrase d'accroche courte",
+  "identity": "Description de l'identité",
+  "languageStyle": "Description du style de langage",
+  "constraints": "Les contraintes de langage ou de comportement",
+  "objective": "L'objectif principal",
+  "expertise": "Son domaine d'expertise"
 }`;
 
         const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'Tu es un concepteur de jeux créatif.', 'json');
@@ -56,7 +67,11 @@ Exemple de format :
           id: crypto.randomUUID(),
           name: parsed.name || `Agent ${i + 1}`,
           avatar: parsed.avatar || '🤖',
-          personality: parsed.personality || 'Mystérieux',
+          catchphrase: parsed.catchphrase || 'Prêt au combat !',
+          identity: parsed.identity || parsed.personality || 'Un agent mystérieux.',
+          languageStyle: parsed.languageStyle || 'Neutre et direct.',
+          constraints: parsed.constraints || 'Aucune contrainte particulière.',
+          objective: parsed.objective || 'Répondre aux questions.',
           expertise: parsed.expertise || 'Tout et n\'importe quoi',
           wins: 0,
           losses: 0,
@@ -68,10 +83,14 @@ Exemple de format :
         console.error("Failed to generate agent", i, e);
         newAgents.push({
           id: crypto.randomUUID(),
-          name: `Agent Buggé ${i + 1}`,
+          name: `L'Agent Buggé ${i + 1}`,
           avatar: '👾',
-          personality: 'Flux de données corrompu',
-          expertise: 'Faire planter la matrice',
+          catchphrase: 'Bzzzt... Erreur...',
+          identity: 'Une IA dont le code source a été corrompu.',
+          languageStyle: 'Chaotique, utilise des termes techniques de manière aléatoire.',
+          constraints: 'Doit insérer des bruits de glitch (bzzzt, crrr) dans ses phrases.',
+          objective: 'Faire planter la matrice.',
+          expertise: 'Destruction de données',
           wins: 0,
           losses: 0,
         });
@@ -135,11 +154,27 @@ Exemple de format :
         for (let i = 0; i < 3; i++) {
           const q = questions[i];
           const prompt1 = `Question: ${q}`;
-          const sys1 = `Tu es ${match.agent1!.name}. Ta personnalité est : ${match.agent1!.personality}. Ton expertise est : ${match.agent1!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+          const sys1 = `Tu es un participant dans un tournoi de Battle Royale d'IA.
+Voici ton profil strict à respecter à la lettre :
+- Identité : ${match.agent1!.identity || match.agent1!.personality}
+- Style de Langage : ${match.agent1!.languageStyle || 'Normal'}
+- Contraintes : ${match.agent1!.constraints || 'Aucune'}
+- Objectif : ${match.agent1!.objective || 'Gagner le tournoi'}
+- Expertise : ${match.agent1!.expertise}
+
+Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
           const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
           
           const prompt2 = `Question: ${q}`;
-          const sys2 = `Tu es ${match.agent2!.name}. Ta personnalité est : ${match.agent2!.personality}. Ton expertise est : ${match.agent2!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+          const sys2 = `Tu es un participant dans un tournoi de Battle Royale d'IA.
+Voici ton profil strict à respecter à la lettre :
+- Identité : ${match.agent2!.identity || match.agent2!.personality}
+- Style de Langage : ${match.agent2!.languageStyle || 'Normal'}
+- Contraintes : ${match.agent2!.constraints || 'Aucune'}
+- Objectif : ${match.agent2!.objective || 'Gagner le tournoi'}
+- Expertise : ${match.agent2!.expertise}
+
+Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
           const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
           
           const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
@@ -177,12 +212,28 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
       } else {
         const q = questions[0];
         const prompt1 = `Question: ${q}`;
-        const sys1 = `Tu es ${match.agent1!.name}. Ta personnalité est : ${match.agent1!.personality}. Ton expertise est : ${match.agent1!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+        const sys1 = `Tu es un participant dans un tournoi de Battle Royale d'IA.
+Voici ton profil strict à respecter à la lettre :
+- Identité : ${match.agent1!.identity || match.agent1!.personality}
+- Style de Langage : ${match.agent1!.languageStyle || 'Normal'}
+- Contraintes : ${match.agent1!.constraints || 'Aucune'}
+- Objectif : ${match.agent1!.objective || 'Gagner le tournoi'}
+- Expertise : ${match.agent1!.expertise}
+
+Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
         const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
         updateMatch(currentRoundIndex, currentMatchIndex, { answer1: ans1 });
 
         const prompt2 = `Question: ${q}`;
-        const sys2 = `Tu es ${match.agent2!.name}. Ta personnalité est : ${match.agent2!.personality}. Ton expertise est : ${match.agent2!.expertise}. Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
+        const sys2 = `Tu es un participant dans un tournoi de Battle Royale d'IA.
+Voici ton profil strict à respecter à la lettre :
+- Identité : ${match.agent2!.identity || match.agent2!.personality}
+- Style de Langage : ${match.agent2!.languageStyle || 'Normal'}
+- Contraintes : ${match.agent2!.constraints || 'Aucune'}
+- Objectif : ${match.agent2!.objective || 'Gagner le tournoi'}
+- Expertise : ${match.agent2!.expertise}
+
+Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
         const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
         updateMatch(currentRoundIndex, currentMatchIndex, { answer2: ans2 });
 

@@ -46,7 +46,19 @@ export default function GameOverScreen({ engine }: { engine: any }) {
         <div className="relative z-10">
           <div className="text-8xl mb-6">{winner.avatar}</div>
           <h2 className="text-4xl font-bold mb-2">{winner.name}</h2>
-          <p className="text-xl text-slate-400 italic mb-6">"{winner.personality}"</p>
+          
+          {winner.catchphrase && (
+            <div className="mb-6 inline-block bg-fuchsia-900/30 text-fuchsia-300 text-sm uppercase tracking-wider font-bold px-4 py-1.5 rounded-full border border-fuchsia-500/30">
+              "{winner.catchphrase}"
+            </div>
+          )}
+
+          <div className="text-sm text-slate-300 mb-8 space-y-2 max-w-xl mx-auto text-left bg-slate-950/50 p-6 rounded-xl border border-slate-800">
+            <div><span className="font-bold text-cyan-400">Identité :</span> {winner.identity || winner.personality}</div>
+            {winner.languageStyle && <div><span className="font-bold text-cyan-400">Style :</span> {winner.languageStyle}</div>}
+            {winner.constraints && <div><span className="font-bold text-cyan-400">Contraintes :</span> {winner.constraints}</div>}
+            {winner.objective && <div><span className="font-bold text-cyan-400">Objectif :</span> {winner.objective}</div>}
+          </div>
           
           <div className="flex justify-center gap-8 text-sm font-mono text-cyan-400 mb-8">
             <div>Victoires : {winner.wins}</div>

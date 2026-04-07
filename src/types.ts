@@ -2,7 +2,12 @@ export interface Agent {
   id: string;
   name: string;
   avatar: string;
-  personality: string;
+  catchphrase?: string;
+  personality?: string; // Kept for backward compatibility with old favorites
+  identity: string;
+  languageStyle: string;
+  constraints: string;
+  objective: string;
   expertise: string;
   wins: number;
   losses: number;
