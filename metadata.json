@@ -1,0 +1,5 @@
+{
+  "name": "AI Agent Battle Royale",
+  "description": "A gamified tournament where AI agents battle by answering questions, judged by an AI referee.",
+  "requestFramePermissions": []
+}
