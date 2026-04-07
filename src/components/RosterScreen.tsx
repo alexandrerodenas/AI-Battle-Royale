@@ -70,7 +70,7 @@ export default function RosterScreen({ engine }: { engine: any }) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             key={agent.id}
-            className={`bg-slate-900 border ${isGenerating ? 'border-slate-800' : 'border-slate-800 hover:border-cyan-500 hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_-5px_rgba(217,70,239,0.3)]'} p-4 rounded-xl transition-all duration-300 group relative flex flex-col`}
+            className={`bg-slate-900 border ${isGenerating ? 'border-slate-800' : 'border-slate-800 hover:border-cyan-500 hover:scale-105 hover:-translate-y-2 hover:shadow-[0_0_30px_-5px_rgba(217,70,239,0.3)] hover:z-50'} p-4 rounded-xl transition-all duration-300 group relative flex flex-col`}
           >
             {!isGenerating && (
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
@@ -105,12 +105,12 @@ export default function RosterScreen({ engine }: { engine: any }) {
 
             {/* Hover Tooltip for Personality */}
             {!isGenerating && (
-              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-4 w-72 p-4 bg-slate-800 text-slate-200 text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none z-50 shadow-2xl transition-all border border-slate-700 scale-95 group-hover:scale-100 origin-bottom text-left space-y-2">
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-4 w-72 p-4 bg-slate-950 text-slate-200 text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none z-50 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all border border-cyan-500/50 scale-95 group-hover:scale-100 origin-bottom text-left space-y-2">
                 <div><span className="font-bold text-cyan-400">Identité :</span> {agent.identity || agent.personality}</div>
                 {agent.languageStyle && <div><span className="font-bold text-cyan-400">Style :</span> {agent.languageStyle}</div>}
                 {agent.constraints && <div><span className="font-bold text-cyan-400">Contraintes :</span> {agent.constraints}</div>}
                 {agent.objective && <div><span className="font-bold text-cyan-400">Objectif :</span> {agent.objective}</div>}
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-800 border-b border-r border-slate-700 rotate-45"></div>
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-slate-950 border-b border-r border-cyan-500/50 rotate-45"></div>
               </div>
             )}
           </motion.div>

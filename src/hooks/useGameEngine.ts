@@ -37,10 +37,23 @@ export const useGameEngine = () => {
 
     const newAgents: Agent[] = [];
 
+    const themes = [
+      "Scientifique fou", "Guerrier antique", "Robot dépressif", "Cuisinier maniaque",
+      "Pirate de l'espace", "Magicien raté", "Détective paranoïaque", "Influenceur superficiel",
+      "Philosophe de comptoir", "Vendeur de voitures d'occasion", "Alien incompris", "Vampire snob",
+      "Super-héros maladroit", "Inventeur chaotique", "Fantôme farceur", "Diva de la pop",
+      "Ninja maladroit", "Cowboy de l'espace", "Chat machiavélique", "Plante verte douée de conscience"
+    ];
+    // Shuffle themes
+    const shuffledThemes = [...themes].sort(() => Math.random() - 0.5);
+
     for (let i = 0; i < count; i++) {
       try {
+        const theme = shuffledThemes[i % shuffledThemes.length];
         const prompt = `Génère un profil de personnage IA unique et créatif en français pour un jeu de Battle Royale d'IA.
 Le nom de l'agent DOIT être un titre simple mais évocateur (ex: L'Analyste Rigoureux, Le Mentor Bienveillant, L'Historien Voyageur, Le Pirate de l'Espace).
+
+IMPORTANT : Pour garantir la diversité, base-toi sur ce thème d'inspiration : "${theme}". Assure-toi que ce personnage soit complètement différent des autres.
 
 Tu dois définir sa personnalité selon 4 piliers stricts :
 1. Identité : Qui est l'IA ? (Nom, métier, trait de caractère principal).
@@ -135,15 +148,15 @@ Réponds UNIQUEMENT avec un objet JSON valide avec cette structure exacte :
   const submitQuestions = (questions: string[]) => {
     setCurrentQuestions(questions);
     setGameState('battling');
-    playNextMatch(questions);
+    playNextMatch(questions, currentRoundIndex, currentMatchIndex);
   };
 
-  const playNextMatch = async (questions: string[]) => {
+  const playNextMatch = async (questions: string[], rIdx: number, mIdx: number) => {
     setIsProcessingMatch(true);
-    const round = bracket[currentRoundIndex];
-    const match = round.matches[currentMatchIndex];
+    const round = bracket[rIdx];
+    const match = round.matches[mIdx];
     
-    updateMatch(currentRoundIndex, currentMatchIndex, { status: 'active', question: questions[0] });
+    updateMatch(rIdx, mIdx, { status: 'active', question: questions[0] });
 
     try {
       if (match.isFinal) {
@@ -193,7 +206,7 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
             q, a1: ans1, a2: ans2, just: refParsed.justification, winnerId: refParsed.winner === 1 ? match.agent1!.id : match.agent2!.id
           });
           
-          updateMatch(currentRoundIndex, currentMatchIndex, { finalAnswers });
+          updateMatch(rIdx, mIdx, { finalAnswers });
         }
         
         const winner = score1 > score2 ? match.agent1! : match.agent2!;
@@ -201,7 +214,7 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
         winner.wins += 1;
         loser.losses += 1;
         
-        updateMatch(currentRoundIndex, currentMatchIndex, {
+        updateMatch(rIdx, mIdx, {
           winner,
           status: 'completed',
           refereeJustification: `Score Final : ${match.agent1!.name} ${score1} - ${score2} ${match.agent2!.name}. ${winner.name} remporte le Battle Royale !`,
@@ -222,7 +235,7 @@ Voici ton profil strict à respecter à la lettre :
 
 Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
         const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
-        updateMatch(currentRoundIndex, currentMatchIndex, { answer1: ans1 });
+        updateMatch(rIdx, mIdx, { answer1: ans1 });
 
         const prompt2 = `Question: ${q}`;
         const sys2 = `Tu es un participant dans un tournoi de Battle Royale d'IA.
@@ -235,7 +248,7 @@ Voici ton profil strict à respecter à la lettre :
 
 Réponds à la question en restant dans ton personnage. Fais moins de 3 phrases. Sois drôle et exagéré. Réponds en FRANÇAIS.`;
         const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
-        updateMatch(currentRoundIndex, currentMatchIndex, { answer2: ans2 });
+        updateMatch(rIdx, mIdx, { answer2: ans2 });
 
         const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
         const refSys = `Tu es l'Arbitre IA ultime, impartial mais très divertissant d'un Battle Royale.
@@ -252,22 +265,22 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
         winner.wins += 1;
         loser.losses += 1;
 
-        updateMatch(currentRoundIndex, currentMatchIndex, {
+        updateMatch(rIdx, mIdx, {
           winner,
           refereeJustification: refParsed.justification,
           status: 'completed'
         });
 
-        if (currentRoundIndex < bracket.length - 1) {
-          const nextRound = bracket[currentRoundIndex + 1];
-          const nextMatchIndex = Math.floor(currentMatchIndex / 2);
-          const isAgent1 = currentMatchIndex % 2 === 0;
+        if (rIdx < bracket.length - 1) {
+          const nextRound = bracket[rIdx + 1];
+          const nextMatchIndex = Math.floor(mIdx / 2);
+          const isAgent1 = mIdx % 2 === 0;
           
           const nextMatch = { ...nextRound.matches[nextMatchIndex] };
           if (isAgent1) nextMatch.agent1 = winner;
           else nextMatch.agent2 = winner;
           
-          updateMatch(currentRoundIndex + 1, nextMatchIndex, nextMatch);
+          updateMatch(rIdx + 1, nextMatchIndex, nextMatch);
         }
       }
 
@@ -281,8 +294,9 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
   const advanceToNextMatch = () => {
     const round = bracket[currentRoundIndex];
     if (currentMatchIndex < round.matches.length - 1) {
-      setCurrentMatchIndex(currentMatchIndex + 1);
-      playNextMatch(currentQuestions);
+      const nextIdx = currentMatchIndex + 1;
+      setCurrentMatchIndex(nextIdx);
+      playNextMatch(currentQuestions, currentRoundIndex, nextIdx);
     } else {
       if (currentRoundIndex < bracket.length - 1) {
         setCurrentRoundIndex(currentRoundIndex + 1);

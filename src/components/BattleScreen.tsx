@@ -87,7 +87,7 @@ export default function BattleScreen({ engine }: { engine: any }) {
                   VS
                 </div>
 
-                <div className={`p-4 rounded-xl border relative group ${activeMatch.winner?.id === activeMatch.agent1?.id ? 'bg-green-900/20 border-green-500' : 'bg-slate-950 border-slate-800'}`}>
+                <div className={`p-4 rounded-xl border relative group hover:z-50 ${activeMatch.winner?.id === activeMatch.agent1?.id ? 'bg-green-900/20 border-green-500' : 'bg-slate-950 border-slate-800'}`}>
                   <div className="flex items-center gap-3 mb-3 border-b border-slate-800 pb-3">
                     <div className="text-4xl">{activeMatch.agent1?.avatar}</div>
                     <div className="min-w-0">
@@ -104,16 +104,16 @@ export default function BattleScreen({ engine }: { engine: any }) {
                   </div>
                   
                   {/* Hover Tooltip for Personality */}
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 bg-slate-800 text-slate-200 text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none z-50 shadow-2xl transition-all border border-slate-700 text-left space-y-1.5">
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 bg-slate-950 text-slate-200 text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none z-50 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all border border-cyan-500/50 text-left space-y-1.5">
                     <div><span className="font-bold text-cyan-400">Identité :</span> {activeMatch.agent1?.identity || activeMatch.agent1?.personality}</div>
                     {activeMatch.agent1?.languageStyle && <div><span className="font-bold text-cyan-400">Style :</span> {activeMatch.agent1?.languageStyle}</div>}
                     {activeMatch.agent1?.constraints && <div><span className="font-bold text-cyan-400">Contraintes :</span> {activeMatch.agent1?.constraints}</div>}
                     {activeMatch.agent1?.objective && <div><span className="font-bold text-cyan-400">Objectif :</span> {activeMatch.agent1?.objective}</div>}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-800 border-b border-r border-slate-700 rotate-45"></div>
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-950 border-b border-r border-cyan-500/50 rotate-45"></div>
                   </div>
                 </div>
 
-                <div className={`p-4 rounded-xl border relative group ${activeMatch.winner?.id === activeMatch.agent2?.id ? 'bg-green-900/20 border-green-500' : 'bg-slate-950 border-slate-800'}`}>
+                <div className={`p-4 rounded-xl border relative group hover:z-50 ${activeMatch.winner?.id === activeMatch.agent2?.id ? 'bg-green-900/20 border-green-500' : 'bg-slate-950 border-slate-800'}`}>
                   <div className="flex items-center gap-3 mb-3 border-b border-slate-800 pb-3">
                     <div className="text-4xl">{activeMatch.agent2?.avatar}</div>
                     <div className="min-w-0">
@@ -130,12 +130,12 @@ export default function BattleScreen({ engine }: { engine: any }) {
                   </div>
 
                   {/* Hover Tooltip for Personality */}
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 bg-slate-800 text-slate-200 text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none z-50 shadow-2xl transition-all border border-slate-700 text-left space-y-1.5">
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-72 p-3 bg-slate-950 text-slate-200 text-xs rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none z-50 shadow-[0_0_30px_rgba(0,0,0,0.8)] transition-all border border-cyan-500/50 text-left space-y-1.5">
                     <div><span className="font-bold text-cyan-400">Identité :</span> {activeMatch.agent2?.identity || activeMatch.agent2?.personality}</div>
                     {activeMatch.agent2?.languageStyle && <div><span className="font-bold text-cyan-400">Style :</span> {activeMatch.agent2?.languageStyle}</div>}
                     {activeMatch.agent2?.constraints && <div><span className="font-bold text-cyan-400">Contraintes :</span> {activeMatch.agent2?.constraints}</div>}
                     {activeMatch.agent2?.objective && <div><span className="font-bold text-cyan-400">Objectif :</span> {activeMatch.agent2?.objective}</div>}
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-800 border-b border-r border-slate-700 rotate-45"></div>
+                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-950 border-b border-r border-cyan-500/50 rotate-45"></div>
                   </div>
                 </div>
               </div>
