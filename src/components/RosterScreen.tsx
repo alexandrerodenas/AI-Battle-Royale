@@ -28,7 +28,9 @@ export default function RosterScreen({ engine }: { engine: any }) {
           </h2>
           <p className="text-slate-400 mt-2">
             {isGenerating 
-              ? `Génération de l'agent ${currentCount + 1} sur ${totalAgents}...` 
+              ? (engine.engineType === 'webgpu' && currentCount === 0 && engine.webGpuProgress)
+                ? `Chargement WebGPU: ${engine.webGpuProgress.text}`
+                : `Génération de l'agent ${currentCount + 1} sur ${totalAgents}...` 
               : '16 Agents IA prêts à combattre. Survolez-les pour voir leur personnalité.'}
           </p>
         </div>
@@ -58,7 +60,11 @@ export default function RosterScreen({ engine }: { engine: any }) {
           <motion.div 
             className="bg-gradient-to-r from-fuchsia-500 to-cyan-500 h-full"
             initial={{ width: 0 }}
-            animate={{ width: `${(currentCount / totalAgents) * 100}%` }}
+            animate={{ 
+              width: (engine.engineType === 'webgpu' && currentCount === 0 && engine.webGpuProgress)
+                ? `${engine.webGpuProgress.progress * 100}%`
+                : `${(currentCount / totalAgents) * 100}%` 
+            }}
             transition={{ duration: 0.3 }}
           />
         </div>
@@ -162,24 +168,35 @@ export default function RosterScreen({ engine }: { engine: any }) {
                 <div className="text-center text-slate-500 py-12">Aucun agent favori sauvegardé pour le moment.</div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {engine.favorites.map((fav: Agent) => (
-                    <div key={fav.id} className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center gap-4 hover:border-slate-600 transition-colors">
-                      <div className="text-4xl">{fav.avatar}</div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold truncate">{fav.name}</h4>
-                        <div className="text-xs text-slate-400 truncate">V: {fav.wins} / D: {fav.losses}</div>
+                  {engine.favorites.map((fav: Agent) => {
+                    const isAlreadyInRoster = engine.agents.some((a: Agent) => a.id === fav.id);
+                    return (
+                    <div key={fav.id} className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex flex-col gap-3 hover:border-slate-600 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="text-4xl">{fav.avatar}</div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-bold truncate">{fav.name}</h4>
+                          <div className="text-xs text-slate-400 truncate">V: {fav.wins} / D: {fav.losses}</div>
+                        </div>
+                        {selectedAgentIndex !== null && (
+                          <button
+                            onClick={() => !isAlreadyInRoster && handleReplace(fav)}
+                            disabled={isAlreadyInRoster}
+                            className={`p-2 rounded-lg transition-colors ${isAlreadyInRoster ? 'bg-slate-800 text-slate-500 cursor-not-allowed' : 'bg-cyan-600 hover:bg-cyan-500 text-white'}`}
+                            title={isAlreadyInRoster ? "Déjà dans le tournoi" : "Remplacer par cet agent"}
+                          >
+                            <UserPlus className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
-                      {selectedAgentIndex !== null && (
-                        <button
-                          onClick={() => handleReplace(fav)}
-                          className="bg-cyan-600 hover:bg-cyan-500 p-2 rounded-lg text-white transition-colors"
-                          title="Remplacer par cet agent"
-                        >
-                          <UserPlus className="w-5 h-5" />
-                        </button>
-                      )}
+                      <div className="text-xs text-slate-300 space-y-1 bg-slate-900/50 p-3 rounded-lg border border-slate-800/50">
+                        <div><span className="font-bold text-cyan-400">Identité :</span> {fav.identity || fav.personality}</div>
+                        {fav.languageStyle && <div><span className="font-bold text-cyan-400">Style :</span> {fav.languageStyle}</div>}
+                        {fav.constraints && <div><span className="font-bold text-cyan-400">Contraintes :</span> {fav.constraints}</div>}
+                        {fav.objective && <div><span className="font-bold text-cyan-400">Objectif :</span> {fav.objective}</div>}
+                      </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
               )}
             </div>

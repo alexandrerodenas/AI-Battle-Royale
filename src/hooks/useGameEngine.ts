@@ -1,12 +1,16 @@
 import { useState } from 'react';
 import { Agent, Match, Round } from '../types';
 import { generateCompletion } from '../services/ollama';
+import { generateWebLLMCompletion, initWebLLM } from '../services/webllm';
 
 export type GameState = 'setup' | 'generating_agents' | 'roster' | 'question_input' | 'battling' | 'game_over';
+export type EngineType = 'ollama' | 'webgpu';
 
 export const useGameEngine = () => {
+  const [engineType, setEngineType] = useState<EngineType>('ollama');
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434');
   const [selectedModel, setSelectedModel] = useState('');
+  const [webGpuProgress, setWebGpuProgress] = useState<{text: string, progress: number} | null>(null);
   const [gameState, setGameState] = useState<GameState>('setup');
   const [agents, setAgents] = useState<Agent[]>([]);
   const [bracket, setBracket] = useState<Round[]>([]);
@@ -29,11 +33,32 @@ export const useGameEngine = () => {
 
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const callLLM = async (prompt: string, system?: string, format?: 'json') => {
+    if (engineType === 'webgpu') {
+      return await generateWebLLMCompletion(prompt, system, format);
+    } else {
+      return await generateCompletion(ollamaUrl, selectedModel, prompt, system, format);
+    }
+  };
+
   const generateAgents = async (count: number = 16) => {
     setGameState('generating_agents');
     setAgents([]);
     setError(null);
     setIsGenerating(true);
+
+    if (engineType === 'webgpu') {
+      try {
+        await initWebLLM("gemma-2-2b-it-q4f32_1-MLC", (progress) => {
+          setWebGpuProgress(progress);
+        });
+      } catch (e: any) {
+        setError("Erreur d'initialisation WebGPU: " + e.message);
+        setIsGenerating(false);
+        setGameState('setup');
+        return;
+      }
+    }
 
     const newAgents: Agent[] = [];
 
@@ -73,7 +98,7 @@ Réponds UNIQUEMENT avec un objet JSON valide avec cette structure exacte :
   "expertise": "Son domaine d'expertise"
 }`;
 
-        const response = await generateCompletion(ollamaUrl, selectedModel, prompt, 'Tu es un concepteur de jeux créatif.', 'json');
+        const response = await callLLM(prompt, 'Tu es un concepteur de jeux créatif.', 'json');
         const parsed = JSON.parse(response);
         
         const agent: Agent = {
@@ -176,7 +201,7 @@ Voici ton profil strict à respecter à la lettre :
 - Expertise : ${match.agent1!.expertise}
 
 Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
-          const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
+          const ans1 = await callLLM(prompt1, sys1);
           
           const prompt2 = `Question: ${q}`;
           const sys2 = `Tu es un participant dans un tournoi de Battle Royale d'IA.
@@ -188,7 +213,7 @@ Voici ton profil strict à respecter à la lettre :
 - Expertise : ${match.agent2!.expertise}
 
 Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
-          const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
+          const ans2 = await callLLM(prompt2, sys2);
           
           const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
           const refSys = `Tu es l'Arbitre IA ultime, impartial et rigoureux d'un Battle Royale.
@@ -197,7 +222,7 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "winner": 1 ou 2 (nombre)
 - "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
           
-          const refRes = await generateCompletion(ollamaUrl, selectedModel, refPrompt, refSys, 'json');
+          const refRes = await callLLM(refPrompt, refSys, 'json');
           const refParsed = JSON.parse(refRes);
           
           if (refParsed.winner === 1) score1++; else score2++;
@@ -234,7 +259,7 @@ Voici ton profil strict à respecter à la lettre :
 - Expertise : ${match.agent1!.expertise}
 
 Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
-        const ans1 = await generateCompletion(ollamaUrl, selectedModel, prompt1, sys1);
+        const ans1 = await callLLM(prompt1, sys1);
         updateMatch(rIdx, mIdx, { answer1: ans1 });
 
         const prompt2 = `Question: ${q}`;
@@ -247,7 +272,7 @@ Voici ton profil strict à respecter à la lettre :
 - Expertise : ${match.agent2!.expertise}
 
 Ta priorité absolue est de fournir une réponse exacte et pertinente à la question. Tu dois le faire en restant strictement dans ton personnage. Fais moins de 3 phrases. Réponds en FRANÇAIS.`;
-        const ans2 = await generateCompletion(ollamaUrl, selectedModel, prompt2, sys2);
+        const ans2 = await callLLM(prompt2, sys2);
         updateMatch(rIdx, mIdx, { answer2: ans2 });
 
         const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
@@ -257,7 +282,7 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "winner": 1 ou 2 (nombre)
 - "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
         
-        const refRes = await generateCompletion(ollamaUrl, selectedModel, refPrompt, refSys, 'json');
+        const refRes = await callLLM(refPrompt, refSys, 'json');
         const refParsed = JSON.parse(refRes);
         
         const winner = refParsed.winner === 1 ? match.agent1! : match.agent2!;
