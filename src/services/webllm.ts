@@ -38,7 +38,8 @@ export const generateWebLLMCompletion = async (
   
   const reply = await engine.chat.completions.create({
     messages,
-    response_format: format === 'json' ? { type: "json_object" } : undefined,
+    // Désactivé temporairement car cause une erreur de binding Wasm (std::string)
+    // response_format: format === 'json' ? { type: "json_object" } : undefined,
   });
   
   return reply.choices[0].message.content;

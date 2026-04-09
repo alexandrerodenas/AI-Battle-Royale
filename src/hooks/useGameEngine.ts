@@ -99,7 +99,10 @@ Réponds UNIQUEMENT avec un objet JSON valide avec cette structure exacte :
 }`;
 
         const response = await callLLM(prompt, 'Tu es un concepteur de jeux créatif.', 'json');
-        const parsed = JSON.parse(response);
+        
+        // Nettoyage de la réponse au cas où le modèle inclut des backticks markdown
+        const cleanedResponse = response?.replace(/```json\n?|```/g, '').trim() || '';
+        const parsed = JSON.parse(cleanedResponse);
         
         const agent: Agent = {
           id: crypto.randomUUID(),
@@ -223,7 +226,8 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
           
           const refRes = await callLLM(refPrompt, refSys, 'json');
-          const refParsed = JSON.parse(refRes);
+          const cleanedRefRes = refRes?.replace(/```json\n?|```/g, '').trim() || '';
+          const refParsed = JSON.parse(cleanedRefRes);
           
           if (refParsed.winner === 1) score1++; else score2++;
           
@@ -283,7 +287,8 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
         
         const refRes = await callLLM(refPrompt, refSys, 'json');
-        const refParsed = JSON.parse(refRes);
+        const cleanedRefRes = refRes?.replace(/```json\n?|```/g, '').trim() || '';
+        const refParsed = JSON.parse(cleanedRefRes);
         
         const winner = refParsed.winner === 1 ? match.agent1! : match.agent2!;
         const loser = refParsed.winner === 1 ? match.agent2! : match.agent1!;
