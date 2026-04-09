@@ -351,6 +351,8 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
   };
 
   return {
+    engineType, setEngineType,
+    webGpuProgress,
     ollamaUrl, setOllamaUrl,
     selectedModel, setSelectedModel,
     gameState, setGameState,
