@@ -12,8 +12,8 @@ export default defineConfig(({mode}) => {
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
-        '@mlc-ai/web-llm': path.resolve(__dirname, 'node_modules/@mlc-ai/web-llm/lib/index.js'),
+        '@': path.resolve('./'),
+        '@mlc-ai/web-llm': path.resolve('./node_modules/@mlc-ai/web-llm/lib/index.js'),
       },
     },
     server: {
