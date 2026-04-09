@@ -13,7 +13,6 @@ export default defineConfig(({mode}) => {
     resolve: {
       alias: {
         '@': path.resolve('./'),
-        '@mlc-ai/web-llm': path.resolve('./node_modules/@mlc-ai/web-llm/lib/index.js'),
       },
     },
     server: {
