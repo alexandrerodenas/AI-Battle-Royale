@@ -69,11 +69,11 @@ export const useGameEngine = () => {
     const newAgents: Agent[] = [];
 
     const themes = [
-      "Scientifique fou", "Guerrier antique", "Robot dépressif", "Cuisinier maniaque",
-      "Pirate de l'espace", "Magicien raté", "Détective paranoïaque", "Influenceur superficiel",
-      "Philosophe de comptoir", "Vendeur de voitures d'occasion", "Alien incompris", "Vampire snob",
-      "Super-héros maladroit", "Inventeur chaotique", "Fantôme farceur", "Diva de la pop",
-      "Ninja maladroit", "Cowboy de l'espace", "Chat machiavélique", "Plante verte douée de conscience"
+      "Ex-militaire", "Infirmier", "Professeur de philosophie", "Ingénieur en BTP", 
+      "Comptable de crise", "Électricien", "Psychologue", "Gestionnaire de risques", 
+      "Avocat", "Architecte", "Mécanicien", "Agriculteur", "Journaliste d'investigation", 
+      "Chirurgien", "Pompier", "Bibliothécaire", "Ancien détective", "Expert en logistique",
+      "Technicien de surface", "Économiste"
     ];
     // Shuffle themes
     const shuffledThemes = [...themes].sort(() => Math.random() - 0.5);
@@ -81,30 +81,31 @@ export const useGameEngine = () => {
     for (let i = 0; i < count; i++) {
       try {
         const theme = shuffledThemes[i % shuffledThemes.length];
-        const prompt = `Génère un profil de personnage IA unique et créatif en français pour un jeu de Battle Royale d'IA.
-Le nom de l'agent DOIT être un titre simple mais évocateur (ex: L'Analyste Rigoureux, Le Mentor Bienveillant, L'Historien Voyageur, Le Pirate de l'Espace).
+        const prompt = `# RÔLE
+Tu es un concepteur de personnages spécialisé dans le réalisme psychologique. Ta mission est de générer un agent pour un jeu de "Battle Royale" textuel. 
 
-IMPORTANT : Pour garantir la diversité, base-toi sur ce thème d'inspiration : "${theme}". Assure-toi que ce personnage soit complètement différent des autres.
+# DIRECTION ARTISTIQUE : "TERRE À TERRE"
+Évite absolument les clichés fantastiques, magiques ou de science-fiction (pas de cyborgs, pas d'elfes, pas de super-pouvoirs). 
+Les agents doivent ressembler à des individus réels, avec des métiers, des tempéraments concrets et des logiques de survie basées sur l'expérience humaine.
 
-Tu dois définir sa personnalité selon 4 piliers stricts :
-1. Identité : Qui est l'IA ? (Nom, métier, trait de caractère principal).
-2. Style de Langage : Quel ton utilise-t-elle ? (Soutenu, familier, technique, imagé, etc.).
-3. Contraintes : Ce qu'elle doit absolument faire ou éviter (ex: ne jamais utiliser d'emojis, toujours faire des rimes, parler en majuscules, etc.).
-4. Objectif : Quelle est sa mission principale lors de l'échange ?
+# CRITÈRES DE PERSONNALITÉ
+L'agent doit posséder :
+1. Un Métier/Background concret : basé sur le thème "${theme}".
+2. Un Style de Combat Logique : Sa manière de répondre aux questions doit refléter son expertise réelle. Un ingénieur sera méthodique et technique ; un avocat sera persuasif et cherchera les failles.
+3. Un Trait de Caractère dominant : (ex: Pragmatique, Sceptique, Résilient, Observateur).
 
+# FORMAT DE SORTIE
 Réponds UNIQUEMENT avec un objet JSON valide avec cette structure exacte :
 {
-  "name": "Titre évocateur",
-  "avatar": "1 seul emoji",
-  "catchphrase": "Une phrase d'accroche courte",
-  "identity": "Description de l'identité",
-  "languageStyle": "Description du style de langage",
-  "constraints": "Les contraintes de langage ou de comportement",
-  "objective": "L'objectif principal",
-  "expertise": "Son domaine d'expertise"
+  "name": "Nom de l'agent",
+  "avatar": "1 seul emoji représentatif",
+  "catchphrase": "Une phrase d'accroche courte et réaliste",
+  "description": "Bref résumé de son passé et de pourquoi il est là (max 2 phrases).",
+  "personality_trait": "Le trait dominant (ex: Sang-froid)",
+  "interaction_style": "Description de comment il s'exprime (ex: Phrases courtes, jargon technique, ton calme)."
 }`;
 
-        const response = await callLLM(prompt, 'Tu es un concepteur de jeux créatif.', 'json');
+        const response = await callLLM(prompt, 'Tu es un concepteur de personnages réalistes.', 'json');
         
         // Nettoyage de la réponse au cas où le modèle inclut des backticks markdown
         const cleanedResponse = response?.replace(/```json\n?|```/g, '').trim() || '';
@@ -113,13 +114,13 @@ Réponds UNIQUEMENT avec un objet JSON valide avec cette structure exacte :
         const agent: Agent = {
           id: crypto.randomUUID(),
           name: parsed.name || `Agent ${i + 1}`,
-          avatar: parsed.avatar || '🤖',
-          catchphrase: parsed.catchphrase || 'Prêt au combat !',
-          identity: parsed.identity || parsed.personality || 'Un agent mystérieux.',
-          languageStyle: parsed.languageStyle || 'Neutre et direct.',
-          constraints: parsed.constraints || 'Aucune contrainte particulière.',
-          objective: parsed.objective || 'Répondre aux questions.',
-          expertise: parsed.expertise || 'Tout et n\'importe quoi',
+          avatar: parsed.avatar || '👤',
+          catchphrase: parsed.catchphrase || 'Prêt au combat.',
+          identity: parsed.description || 'Un individu déterminé à survivre.',
+          languageStyle: parsed.interaction_style || 'Direct et pragmatique.',
+          constraints: `Doit rester fidèle à son métier et son trait : ${parsed.personality_trait}`,
+          objective: 'Survivre en utilisant sa logique et son expertise.',
+          expertise: parsed.personality_trait || 'Survie',
           wins: 0,
           losses: 0,
         };
@@ -226,10 +227,11 @@ Ta priorité absolue est de fournir une réponse exacte et pertinente à la ques
           
           const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
           const refSys = `Tu es l'Arbitre IA ultime, impartial et rigoureux d'un Battle Royale.
-Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de l'exactitude, de la pertinence de la réponse, et du respect de leur persona.
+Ton travail est de juger deux réponses à une question et de décider du gagnant.
+DIRECTION : Privilégie les agents qui font preuve de logique, de réalisme et de sens pratique dans leurs réponses. Élimine ceux qui tombent dans l'arrogance gratuite ou les réponses floues.
 Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "winner": 1 ou 2 (nombre)
-- "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
+- "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude et le réalisme).`;
           
           const refRes = await callLLM(refPrompt, refSys, 'json');
           const cleanedRefRes = refRes?.replace(/```json\n?|```/g, '').trim() || '';
@@ -287,10 +289,11 @@ Ta priorité absolue est de fournir une réponse exacte et pertinente à la ques
 
         const refPrompt = `Question: ${q}\n\nRéponse de l'Agent 1 (${match.agent1!.name}) :\n${ans1}\n\nRéponse de l'Agent 2 (${match.agent2!.name}) :\n${ans2}`;
         const refSys = `Tu es l'Arbitre IA ultime, impartial et rigoureux d'un Battle Royale.
-Ton travail est de juger deux réponses à une question et de décider du gagnant en fonction de l'exactitude, de la pertinence de la réponse, et du respect de leur persona.
+Ton travail est de juger deux réponses à une question et de décider du gagnant.
+DIRECTION : Privilégie les agents qui font preuve de logique, de réalisme et de sens pratique dans leurs réponses. Élimine ceux qui tombent dans l'arrogance gratuite ou les réponses floues.
 Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
 - "winner": 1 ou 2 (nombre)
-- "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude).`;
+- "justification": Une explication courte et percutante de pourquoi il a gagné (en valorisant l'exactitude et le réalisme).`;
         
         const refRes = await callLLM(refPrompt, refSys, 'json');
         const cleanedRefRes = refRes?.replace(/```json\n?|```/g, '').trim() || '';
