@@ -2,13 +2,17 @@ import { useState } from 'react';
 import { Agent, Match, Round } from '../types';
 import { generateCompletion } from '../services/ollama';
 import { generateWebLLMCompletion, initWebLLM } from '../services/webllm';
+import { generateOpenAICompletion } from '../services/openai';
 
 export type GameState = 'setup' | 'generating_agents' | 'roster' | 'question_input' | 'battling' | 'game_over';
-export type EngineType = 'ollama' | 'webgpu';
+export type EngineType = 'ollama' | 'webgpu' | 'openai';
 
 export const useGameEngine = () => {
   const [engineType, setEngineType] = useState<EngineType>('ollama');
   const [ollamaUrl, setOllamaUrl] = useState('http://localhost:11434');
+  const [openaiUrl, setOpenaiUrl] = useState('https://api.openai.com');
+  const [openaiKey, setOpenaiKey] = useState('');
+  const [openaiModel, setOpenaiModel] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [webGpuProgress, setWebGpuProgress] = useState<{text: string, progress: number} | null>(null);
   const [gameState, setGameState] = useState<GameState>('setup');
@@ -36,6 +40,8 @@ export const useGameEngine = () => {
   const callLLM = async (prompt: string, system?: string, format?: 'json') => {
     if (engineType === 'webgpu') {
       return await generateWebLLMCompletion(prompt, system, format);
+    } else if (engineType === 'openai') {
+      return await generateOpenAICompletion(openaiUrl, openaiKey, openaiModel || selectedModel, prompt, system, format);
     } else {
       return await generateCompletion(ollamaUrl, selectedModel, prompt, system, format);
     }
@@ -359,6 +365,9 @@ Réponds UNIQUEMENT avec un objet JSON en FRANÇAIS avec :
     engineType, setEngineType,
     webGpuProgress,
     ollamaUrl, setOllamaUrl,
+    openaiUrl, setOpenaiUrl,
+    openaiKey, setOpenaiKey,
+    openaiModel, setOpenaiModel,
     selectedModel, setSelectedModel,
     gameState, setGameState,
     agents, setAgents,
