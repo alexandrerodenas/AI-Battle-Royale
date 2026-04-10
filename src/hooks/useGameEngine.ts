@@ -3,6 +3,7 @@ import { Agent, Match, Round } from '../types';
 import { generateCompletion } from '../services/ollama';
 import { generateWebLLMCompletion, initWebLLM } from '../services/webllm';
 import { generateOpenAICompletion } from '../services/openai';
+import { generateTransformersCompletion, initTransformers } from '../services/transformers';
 
 export type GameState = 'setup' | 'generating_agents' | 'roster' | 'question_input' | 'battling' | 'game_over';
 export type EngineType = 'ollama' | 'webgpu' | 'openai';
@@ -39,7 +40,7 @@ export const useGameEngine = () => {
 
   const callLLM = async (prompt: string, system?: string, format?: 'json') => {
     if (engineType === 'webgpu') {
-      return await generateWebLLMCompletion(prompt, system, format);
+      return await generateTransformersCompletion(prompt, system, format);
     } else if (engineType === 'openai') {
       return await generateOpenAICompletion(openaiUrl, openaiKey, openaiModel || selectedModel, prompt, system, format);
     } else {
@@ -55,11 +56,11 @@ export const useGameEngine = () => {
 
     if (engineType === 'webgpu') {
       try {
-        await initWebLLM("gemma-2-2b-it-q4f32_1-MLC", (progress) => {
+        await initTransformers("onnx-community/gemma-4-E2B-it-ONNX", (progress) => {
           setWebGpuProgress(progress);
         });
       } catch (e: any) {
-        setError("Erreur d'initialisation WebGPU: " + e.message);
+        setError("Erreur d'initialisation WebGPU (Gemma 4): " + e.message);
         setIsGenerating(false);
         setGameState('setup');
         return;

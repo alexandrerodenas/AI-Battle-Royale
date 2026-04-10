@@ -170,12 +170,12 @@ export default function SetupScreen({ engine }: { engine: any }) {
                 <MonitorPlay className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-lg text-slate-200">Gemma-2-2B WebGPU</h3>
+                <h3 className="font-bold text-lg text-slate-200">Gemma 4 WebGPU 🚀</h3>
                 <p className="text-sm text-slate-400 mt-1">
-                  Le modèle sera téléchargé et exécuté directement dans votre navigateur en utilisant la carte graphique de votre appareil.
-                  Aucune installation locale n'est requise.
+                  Le modèle <strong>Gemma 4</strong> sera téléchargé et exécuté localement dans votre navigateur via WebGPU et Transformers.js.
+                  Performance optimale et confidentialité totale.
                 </p>
-                <p className="text-xs text-cyan-500 mt-2 font-mono">Modèle: gemma-2-2b-it-q4f32_1-MLC</p>
+                <p className="text-xs text-cyan-500 mt-2 font-mono">Modèle: onnx-community/gemma-4-E2B-it-ONNX</p>
               </div>
             </div>
           </div>

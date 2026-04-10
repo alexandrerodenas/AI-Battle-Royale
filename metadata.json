@@ -1,5 +1,5 @@
 {
   "name": "AI Agent Battle Royale",
-  "description": "A gamified tournament where AI agents battle by answering questions, judged by an AI referee.",
+  "description": "A gamified tournament where AI agents battle by answering questions, judged by an AI referee. Supports local execution via Gemma 4 WebGPU.",
   "requestFramePermissions": []
 }
